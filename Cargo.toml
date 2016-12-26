@@ -1,0 +1,10 @@
+[package]
+name = "prefix-tree"
+version = "0.1.0"
+authors = ["Dominik Miedziński <dominik@mdzn.pl>"]
+license = "GPL-3.0"
+repository = "https://github.com/miedzinski/prefix-tree.rs"
+description = "Append-only compressed prefix tree"
+keywords = ["prefix", "trie", "radix", "tree"]
+
+[dependencies]
