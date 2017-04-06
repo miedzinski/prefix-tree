@@ -1,5 +1,5 @@
 pub struct Node<T> {
-    pub key: Vec<u8>,
+    key: Vec<u8>,
     pub value: Option<T>,
     child: Option<Box<Node<T>>>,
     sibling: Option<Box<Node<T>>>,
@@ -26,7 +26,7 @@ impl<T> Node<T> {
             .count()
     }
 
-    fn find<K: AsRef<[u8]>>(&self, key: K) -> Option<&Node<T>> {
+    pub fn find<K: AsRef<[u8]>>(&self, key: K) -> Option<&Node<T>> {
         let key = key.as_ref();
         let prefix = self.common_prefix(key);
         if prefix == 0 {
@@ -42,7 +42,23 @@ impl<T> Node<T> {
         }
     }
 
-    fn insert<K: AsRef<[u8]>>(&mut self, key: K, value: T) {
+    pub fn find_mut<K: AsRef<[u8]>>(&mut self, key: K) -> Option<&mut Node<T>> {
+        let key = key.as_ref();
+        let prefix = self.common_prefix(key);
+        if prefix == 0 {
+            self.sibling.as_mut().and_then(|x| x.find_mut(key))
+        } else if prefix == self.key.len() {
+            if prefix == key.len() {
+                Some(self)
+            } else {
+                self.child.as_mut().and_then(|x| x.find_mut(&key[prefix..]))
+            }
+        } else {
+            None
+        }
+    }
+
+    pub fn insert<K: AsRef<[u8]>>(&mut self, key: K, value: T) {
         let key = key.as_ref();
         let prefix = self.common_prefix(key);
         if prefix == 0 {
@@ -83,6 +99,10 @@ impl<T> Tree<T> {
         self.root.as_ref().and_then(|x| x.find(key))
     }
 
+    pub fn find_mut<K: AsRef<[u8]>>(&mut self, key: K) -> Option<&mut Node<T>> {
+        self.root.as_mut().and_then(|x| x.find_mut(key))
+    }
+
     pub fn insert<K: AsRef<[u8]>>(&mut self, key: K, value: T) {
         match self.root {
             Some(ref mut root) => root.insert(key, value),
@@ -119,6 +139,13 @@ mod tests {
         assert!(t.find("foo").is_none());
     }
 
+    #[test]
+    fn test_find_mut_empty() {
+        let mut t = Tree::<()> { root: None };
+        assert!(t.find_mut("").is_none());
+        assert!(t.find_mut("foo").is_none());
+    }
+
     fn sample_tree() -> Tree<i32> {
         Tree {
             root: Some(Box::new(Node {
@@ -141,8 +168,18 @@ mod tests {
     }
 
     #[test]
+    fn test_find_mut_simple() {
+        assert!(sample_tree().find_mut("fo").unwrap().value == Some(0));
+    }
+
+    #[test]
     fn test_find_child() {
         assert!(sample_tree().find("foo").unwrap().value == Some(1));
+    }
+
+    #[test]
+    fn test_find_mut_child() {
+        assert!(sample_tree().find_mut("foo").unwrap().value == Some(1));
     }
 
     #[test]
@@ -151,8 +188,18 @@ mod tests {
     }
 
     #[test]
+    fn test_find_mut_sibling() {
+        assert!(sample_tree().find_mut("bar").unwrap().value == Some(3));
+    }
+
+    #[test]
     fn test_find_missing() {
         assert!(sample_tree().find("quux").is_none());
+    }
+
+    #[test]
+    fn test_find_mut_missing() {
+        assert!(sample_tree().find_mut("quux").is_none());
     }
 
     #[test]
@@ -161,8 +208,18 @@ mod tests {
     }
 
     #[test]
+    fn test_find_mut_shorter() {
+        assert!(sample_tree().find_mut("f").is_none());
+    }
+
+    #[test]
     fn test_find_longer() {
         assert!(sample_tree().find("fooo").is_none());
+    }
+
+    #[test]
+    fn test_find_mut_longer() {
+        assert!(sample_tree().find_mut("fooo").is_none());
     }
 
     #[test]
