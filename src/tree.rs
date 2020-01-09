@@ -1,3 +1,5 @@
+use std::mem;
+
 fn common_prefix<T: Eq>(a: &[T], b: &[T]) -> usize {
     a.iter().zip(b).take_while(|&(a, b)| a == b).count()
 }
@@ -6,8 +8,7 @@ fn common_prefix<T: Eq>(a: &[T], b: &[T]) -> usize {
 pub struct Tree<K, V> {
     key: Vec<K>,
     pub value: Option<V>,
-    child: Option<Box<Tree<K, V>>>,
-    sibling: Option<Box<Tree<K, V>>>,
+    children: Vec<Tree<K, V>>,
 }
 
 impl<K: Eq + Clone, V> Tree<K, V> {
@@ -15,70 +16,67 @@ impl<K: Eq + Clone, V> Tree<K, V> {
         Tree {
             key,
             value: Some(value),
-            child: None,
-            sibling: None,
+            children: vec![],
         }
     }
 
     pub fn find(&self, key: &[K]) -> Option<&Tree<K, V>> {
-        if key.is_empty() && self.key.is_empty() {
-            return Some(self);
+        let p = common_prefix(&self.key, key);
+        if p != self.key.len() {
+            return None;
         }
-        match common_prefix(&self.key, key) {
-            0 => self.sibling.as_ref().and_then(|x| x.find(key)),
-            p if p == self.key.len() => {
-                if p == key.len() {
-                    Some(self)
-                } else {
-                    self.child.as_ref().and_then(|x| x.find(&key[p..]))
-                }
-            }
-            _ => None,
+        if p < key.len() {
+            self.children
+                .iter()
+                .map(|x| x.find(&key[p..]))
+                .filter_map(|x| x)
+                .next()
+        } else if self.value.is_some() {
+            Some(self)
+        } else {
+            None
         }
     }
 
     pub fn find_mut(&mut self, key: &[K]) -> Option<&mut Tree<K, V>> {
-        if key.is_empty() && self.key.is_empty() {
-            return Some(self);
+        let p = common_prefix(&self.key, key);
+        if p != self.key.len() {
+            return None;
         }
-        match common_prefix(&self.key, key) {
-            0 => self.sibling.as_mut().and_then(|x| x.find_mut(key)),
-            p if p == self.key.len() => {
-                if p == key.len() {
-                    Some(self)
-                } else {
-                    self.child.as_mut().and_then(|x| x.find_mut(&key[p..]))
-                }
-            }
-            _ => None,
+        if p < key.len() {
+            self.children
+                .iter_mut()
+                .map(|x| x.find_mut(&key[p..]))
+                .filter_map(|x| x)
+                .next()
+        } else if self.value.is_some() {
+            Some(self)
+        } else {
+            None
         }
     }
 
     pub fn insert(&mut self, key: &[K], value: V) {
-        let prefix = common_prefix(&self.key, key);
-        if prefix == 0 {
-            if let Some(ref mut sibling) = self.sibling {
-                sibling.insert(key, value);
-            } else {
-                self.sibling = Some(Box::new(Tree::new(key.to_vec(), value)));
-            }
+        let p = common_prefix(&self.key, key);
+        if p < self.key.len() {
+            let child = Tree {
+                key: self.key.split_off(p),
+                value: self.value.take(),
+                children: mem::take(&mut self.children),
+            };
+            self.children.push(child);
+        }
+        if p == key.len() {
+            self.value = Some(value);
         } else {
-            if prefix < self.key.len() {
-                self.child = Some(Box::new(Tree {
-                    key: self.key.split_off(prefix),
-                    value: self.value.take(),
-                    child: self.child.take(),
-                    sibling: None,
-                }));
-            }
-            if prefix < key.len() {
-                if let Some(ref mut child) = self.child {
-                    child.insert(&key[prefix..], value);
-                } else {
-                    self.child = Some(Box::new(Tree::new(key[prefix..].to_vec(), value)));
-                }
+            let mut child = self
+                .children
+                .iter_mut()
+                .find(|x| common_prefix(&x.key, &key[p..]) > 0);
+            if let Some(ref mut child) = child {
+                child.insert(&key[p..], value);
             } else {
-                self.value = Some(value);
+                self.children.push(Tree::new(key[p..].to_vec(), value));
             }
         }
     }
@@ -96,15 +94,16 @@ mod tests {
 
     fn sample_tree() -> Tree<i32, u8> {
         Tree {
-            key: vec![1, 2],
-            value: Some(0),
-            child: Some(Box::new(Tree {
-                key: vec![3],
-                value: Some(1),
-                child: None,
-                sibling: Some(Box::new(Tree::new(vec![-3], 2))),
-            })),
-            sibling: Some(Box::new(Tree::new(vec![9, 8, 7], 3))),
+            key: vec![],
+            value: None,
+            children: vec![
+                Tree {
+                    key: vec![1, 2],
+                    value: Some(0),
+                    children: vec![Tree::new(vec![3], 1), Tree::new(vec![-3], 2)],
+                },
+                Tree::new(vec![9, 8, 7], 3),
+            ],
         }
     }
 
@@ -114,7 +113,7 @@ mod tests {
         assert_eq!(t.find(&[1, 2]).and_then(|x| x.value), Some(0));
         assert_eq!(t.find(&[1, 2, 3]).and_then(|x| x.value), Some(1));
         assert_eq!(t.find(&[9, 8, 7]).and_then(|x| x.value), Some(3));
-        assert!(t.find(&[]).is_none());
+        assert!(dbg!(t.find(&[])).is_none());
         assert!(t.find(&[4, 5, 6]).is_none());
         assert!(t.find(&[0]).is_none());
         assert!(t.find(&[1, 2, 3, 3]).is_none());
@@ -140,13 +139,13 @@ mod tests {
     }
 
     #[test]
-    fn test_insert_append() {
+    fn test_insert() {
         let mut root = Tree::new(vec![1, 2, 3], 0);
+        root.insert(&[3, 2, 1], -1);
         root.insert(&[], 999);
         root.insert(&[1], 2);
         root.insert(&[1, 2, 3, 4, 5, 6], 1);
         root.insert(&[1, 2, 3, 4, 5, 6, 7, 8, 9], 2);
-        root.insert(&[3, 2, 1], -1);
         root.insert(&[1, 2, 5, 6], 9);
 
         assert_eq!(root.find(&[]).and_then(|x| x.value), Some(999));
