@@ -20,14 +20,6 @@ impl<K: Eq + Clone, V> Tree<K, V> {
         }
     }
 
-    pub fn common_prefix(&self, other: &[K]) -> usize {
-        self.key
-            .iter()
-            .zip(other.as_ref().iter())
-            .take_while(|&(a, b)| a == b)
-            .count()
-    }
-
     pub fn find(&self, key: &[K]) -> Option<&Tree<K, V>> {
         if key.is_empty() && self.key.is_empty() {
             return Some(self);
@@ -49,7 +41,7 @@ impl<K: Eq + Clone, V> Tree<K, V> {
         if key.is_empty() && self.key.is_empty() {
             return Some(self);
         }
-        match self.common_prefix(key) {
+        match common_prefix(&self.key, key) {
             0 => self.sibling.as_mut().and_then(|x| x.find_mut(key)),
             p if p == self.key.len() => {
                 if p == key.len() {
@@ -63,7 +55,7 @@ impl<K: Eq + Clone, V> Tree<K, V> {
     }
 
     pub fn insert(&mut self, key: &[K], value: V) {
-        let prefix = self.common_prefix(key);
+        let prefix = common_prefix(&self.key, key);
         if prefix == 0 {
             if let Some(ref mut sibling) = self.sibling {
                 sibling.insert(key, value);
