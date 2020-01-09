@@ -12,6 +12,10 @@ impl<T: Eq + Clone> PrefixTreeSet<T> {
         }
     }
 
+    pub fn clear(&mut self) {
+        self.map.clear()
+    }
+
     pub fn contains<Q>(&self, key: Q) -> bool
     where
         Q: AsRef<[T]>,
@@ -24,5 +28,9 @@ impl<T: Eq + Clone> PrefixTreeSet<T> {
         Q: AsRef<[T]>,
     {
         self.map.insert(key, ())
+    }
+
+    pub fn is_empty(&self) -> bool {
+        self.map.is_empty()
     }
 }
