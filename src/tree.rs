@@ -4,7 +4,7 @@ fn common_prefix<T: Eq>(a: &[T], b: &[T]) -> usize {
     a.iter().zip(b).take_while(|&(a, b)| a == b).count()
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, Default)]
 pub struct Tree<K, V> {
     key: Vec<K>,
     pub value: Option<V>,
@@ -16,6 +16,14 @@ impl<K: Eq + Clone, V> Tree<K, V> {
         Tree {
             key,
             value: Some(value),
+            children: vec![],
+        }
+    }
+
+    pub fn empty() -> Tree<K, V> {
+        Tree {
+            key: vec![],
+            value: None,
             children: vec![],
         }
     }
@@ -56,7 +64,7 @@ impl<K: Eq + Clone, V> Tree<K, V> {
         }
     }
 
-    pub fn insert(&mut self, key: &[K], value: V) {
+    pub fn insert(&mut self, key: &[K], value: V) -> Option<V> {
         let p = common_prefix(&self.key, key);
         if p < self.key.len() {
             let child = Tree {
@@ -67,16 +75,17 @@ impl<K: Eq + Clone, V> Tree<K, V> {
             self.children.push(child);
         }
         if p == key.len() {
-            self.value = Some(value);
+            self.value.replace(value)
         } else {
             let mut child = self
                 .children
                 .iter_mut()
                 .find(|x| common_prefix(&x.key, &key[p..]) > 0);
             if let Some(ref mut child) = child {
-                child.insert(&key[p..], value);
+                child.insert(&key[p..], value)
             } else {
                 self.children.push(Tree::new(key[p..].to_vec(), value));
+                None
             }
         }
     }

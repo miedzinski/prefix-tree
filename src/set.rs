@@ -65,15 +65,15 @@ impl<T: Eq + Clone> PrefixTreeSet<T> {
     /// use prefix_tree::PrefixTreeSet;
     ///
     /// let mut set: PrefixTreeSet<u8> = PrefixTreeSet::new();
-    /// set.insert("1");
-    /// set.insert("1");
+    /// assert_eq!(set.insert("1"), true);
+    /// assert_eq!(set.insert("1"), false);
     /// assert_eq!(set.contains("1"), true);
     /// ```
-    pub fn insert<Q>(&mut self, key: Q)
+    pub fn insert<Q>(&mut self, key: Q) -> bool
     where
         Q: AsRef<[T]>,
     {
-        self.map.insert(key, ())
+        self.map.insert(key, ()).is_none()
     }
 
     /// Returns `true` if the set contains no elements.
@@ -90,5 +90,21 @@ impl<T: Eq + Clone> PrefixTreeSet<T> {
     /// ```
     pub fn is_empty(&self) -> bool {
         self.map.is_empty()
+    }
+
+    /// Returns the number of elements in the set.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use prefix_tree::PrefixTreeSet;
+    ///
+    /// let mut set: PrefixTreeSet<u8> = PrefixTreeSet::new();
+    /// assert_eq!(set.len(), 0);
+    /// set.insert("foo");
+    /// assert_eq!(set.len(), 1);
+    /// ```
+    pub fn len(&self) -> usize {
+        self.map.len()
     }
 }

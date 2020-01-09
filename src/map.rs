@@ -3,7 +3,8 @@ use crate::tree::Tree;
 /// A map implemented with prefix tree.
 #[derive(Debug, Clone, Default)]
 pub struct PrefixTreeMap<K, V> {
-    root: Option<Tree<K, V>>,
+    root: Tree<K, V>,
+    length: usize,
 }
 
 impl<K: Eq + Clone, V> PrefixTreeMap<K, V> {
@@ -17,7 +18,10 @@ impl<K: Eq + Clone, V> PrefixTreeMap<K, V> {
     /// let mut map: PrefixTreeMap<u8, i32> = PrefixTreeMap::new();
     /// ```
     pub fn new() -> PrefixTreeMap<K, V> {
-        PrefixTreeMap { root: None }
+        PrefixTreeMap {
+            root: Tree::empty(),
+            length: 0,
+        }
     }
 
     /// Returns `true` if the map contains a value for the specifiec key.
@@ -52,7 +56,7 @@ impl<K: Eq + Clone, V> PrefixTreeMap<K, V> {
     /// assert!(map.is_empty());
     /// ```
     pub fn clear(&mut self) {
-        self.root = None
+        *self = PrefixTreeMap::new();
     }
 
     /// Returns a reference to the value corresponding to the key.
@@ -71,11 +75,7 @@ impl<K: Eq + Clone, V> PrefixTreeMap<K, V> {
     where
         Q: AsRef<[K]>,
     {
-        self.root
-            .as_ref()
-            .and_then(|x| x.find(key.as_ref()))
-            .map(|x| x.value.as_ref())
-            .flatten()
+        self.root.find(key.as_ref()).and_then(|x| x.value.as_ref())
     }
 
     /// Returns a mutable reference to the value corresponding to the key.
@@ -97,10 +97,8 @@ impl<K: Eq + Clone, V> PrefixTreeMap<K, V> {
         Q: AsRef<[K]>,
     {
         self.root
-            .as_mut()
-            .and_then(|x| x.find_mut(key.as_ref()))
-            .map(|x| x.value.as_mut())
-            .flatten()
+            .find_mut(key.as_ref())
+            .and_then(|x| x.value.as_mut())
     }
 
     /// Inserts a key-value pair into the map.
@@ -111,20 +109,20 @@ impl<K: Eq + Clone, V> PrefixTreeMap<K, V> {
     /// use prefix_tree::PrefixTreeMap;
     ///
     /// let mut map: PrefixTreeMap<u8, i32> = PrefixTreeMap::new();
-    /// map.insert("a", 42);
+    /// assert_eq!(map.insert("a", 42), None);
     /// assert_eq!(map.is_empty(), false);
-    /// map.insert("a", 5);
+    /// assert_eq!(map.insert("a", 5), Some(42));
     /// assert_eq!(map.get("a"), Some(&5));
     /// ```
-    pub fn insert<Q>(&mut self, key: Q, value: V)
+    pub fn insert<Q>(&mut self, key: Q, value: V) -> Option<V>
     where
         Q: AsRef<[K]>,
     {
-        if let Some(ref mut root) = self.root {
-            root.insert(key.as_ref(), value);
-        } else {
-            self.root = Some(Tree::new(key.as_ref().to_vec(), value));
+        let old = self.root.insert(key.as_ref(), value);
+        if old.is_none() {
+            self.length += 1;
         }
+        old
     }
 
     /// Returns `true` if the map contains no elements.
@@ -140,6 +138,22 @@ impl<K: Eq + Clone, V> PrefixTreeMap<K, V> {
     /// assert_eq!(map.is_empty(), false);
     /// ```
     pub fn is_empty(&self) -> bool {
-        self.root.is_none()
+        self.len() == 0
+    }
+
+    /// Returns the number of elements in the map.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use prefix_tree::PrefixTreeMap;
+    ///
+    /// let mut map: PrefixTreeMap<u8, i32> = PrefixTreeMap::new();
+    /// assert_eq!(map.len(), 0);
+    /// map.insert("foo", 1);
+    /// assert_eq!(map.len(), 1);
+    /// ```
+    pub fn len(&self) -> usize {
+        self.length
     }
 }
