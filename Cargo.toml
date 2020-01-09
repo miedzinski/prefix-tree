@@ -1,10 +1,10 @@
 [package]
 name = "prefix-tree"
-version = "0.1.0"
+version = "0.2.0"
 authors = ["Dominik Miedziński <dominik@mdzn.pl>"]
-license = "GPL-3.0"
-repository = "https://github.com/miedzinski/prefix-tree.rs"
-description = "Append-only compressed prefix tree"
-keywords = ["prefix", "trie", "radix", "tree"]
+license = "MIT"
+repository = "https://github.com/miedzinski/prefix-tree"
+description = "Map and set interface using trie data structure"
+keywords = ["prefix", "trie", "radix", "patricia", "tree", "map", "set"]
 
 [dependencies]
