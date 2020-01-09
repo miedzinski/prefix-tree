@@ -5,6 +5,6 @@ authors = ["Dominik Miedziński <dominik@mdzn.pl>"]
 license = "MIT"
 repository = "https://github.com/miedzinski/prefix-tree"
 description = "A map and set interfaces using trie data structure"
-keywords = ["prefix", "trie", "radix", "patricia", "tree", "map", "set"]
+keywords = ["prefix", "trie", "radix", "patricia", "tree"]
 
 [dependencies]
