@@ -1,10 +1,10 @@
 [package]
 name = "prefix-tree"
-version = "0.2.0"
+version = "0.2.1"
 authors = ["Dominik Miedziński <dominik@mdzn.pl>"]
 license = "MIT"
 repository = "https://github.com/miedzinski/prefix-tree"
-description = "Map and set interface using trie data structure"
+description = "A map and set interfaces using trie data structure"
 keywords = ["prefix", "trie", "radix", "patricia", "tree", "map", "set"]
 
 [dependencies]
