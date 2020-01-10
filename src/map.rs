@@ -24,7 +24,7 @@ impl<K: Eq + Clone, V> PrefixTreeMap<K, V> {
         }
     }
 
-    /// Returns `true` if the map contains a value for the specifiec key.
+    /// Returns `true` if the map contains a value for the specified key.
     ///
     /// # Examples
     ///

@@ -39,7 +39,7 @@ impl<T: Eq + Clone> PrefixTreeSet<T> {
     }
 
     /// Returns `true` if the set contains a value.
-
+    ///
     /// # Examples
     ///
     /// ```
