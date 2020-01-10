@@ -14,7 +14,7 @@ Include this library in your project by adding the following to your `Cargo.toml
 
 ```toml
 [dependencies]
-prefix-tree = "0.2.1"
+prefix-tree = "0.3.0"
 ```
 
 # License
