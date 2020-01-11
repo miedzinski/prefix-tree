@@ -2,5 +2,5 @@ mod map;
 mod set;
 mod tree;
 
-pub use map::PrefixTreeMap;
-pub use set::PrefixTreeSet;
+pub use map::PrefixMap;
+pub use set::PrefixSet;

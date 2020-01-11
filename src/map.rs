@@ -2,23 +2,23 @@ use crate::tree::Tree;
 
 /// A map implemented with prefix tree.
 #[derive(Debug, Clone, Default)]
-pub struct PrefixTreeMap<K, V> {
+pub struct PrefixMap<K, V> {
     root: Tree<K, V>,
     length: usize,
 }
 
-impl<K: Eq + Clone, V> PrefixTreeMap<K, V> {
-    /// Creates an empty `PrefixTreeMap`.
+impl<K: Eq + Clone, V> PrefixMap<K, V> {
+    /// Creates an empty `PrefixMap`.
     ///
     /// # Examples
     ///
     /// ```
-    /// use prefix_tree::PrefixTreeMap;
+    /// use prefix_tree::PrefixMap;
     ///
-    /// let mut map: PrefixTreeMap<u8, i32> = PrefixTreeMap::new();
+    /// let mut map: PrefixMap<u8, i32> = PrefixMap::new();
     /// ```
-    pub fn new() -> PrefixTreeMap<K, V> {
-        PrefixTreeMap {
+    pub fn new() -> PrefixMap<K, V> {
+        PrefixMap {
             root: Tree::empty(),
             length: 0,
         }
@@ -29,9 +29,9 @@ impl<K: Eq + Clone, V> PrefixTreeMap<K, V> {
     /// # Examples
     ///
     /// ```
-    /// use prefix_tree::PrefixTreeMap;
+    /// use prefix_tree::PrefixMap;
     ///
-    /// let mut map: PrefixTreeMap<u8, i32> = PrefixTreeMap::new();
+    /// let mut map: PrefixMap<u8, i32> = PrefixMap::new();
     /// map.insert("foo", 1);
     /// assert_eq!(map.contains_key("foo"), true);
     /// assert_eq!(map.contains_key("bar"), false);
@@ -48,15 +48,15 @@ impl<K: Eq + Clone, V> PrefixTreeMap<K, V> {
     /// # Examples
     ///
     /// ```
-    /// use prefix_tree::PrefixTreeMap;
+    /// use prefix_tree::PrefixMap;
     ///
-    /// let mut map: PrefixTreeMap<u8, i32> = PrefixTreeMap::new();
+    /// let mut map: PrefixMap<u8, i32> = PrefixMap::new();
     /// map.insert("foo", 1);
     /// map.clear();
     /// assert!(map.is_empty());
     /// ```
     pub fn clear(&mut self) {
-        *self = PrefixTreeMap::new();
+        *self = PrefixMap::new();
     }
 
     /// Returns a reference to the value corresponding to the key.
@@ -64,9 +64,9 @@ impl<K: Eq + Clone, V> PrefixTreeMap<K, V> {
     /// # Examples
     ///
     /// ```
-    /// use prefix_tree::PrefixTreeMap;
+    /// use prefix_tree::PrefixMap;
     ///
-    /// let mut map: PrefixTreeMap<u8, i32> = PrefixTreeMap::new();
+    /// let mut map: PrefixMap<u8, i32> = PrefixMap::new();
     /// map.insert("foo", 1);
     /// assert_eq!(map.get("foo"), Some(&1));
     /// assert_eq!(map.get("bar"), None);
@@ -83,9 +83,9 @@ impl<K: Eq + Clone, V> PrefixTreeMap<K, V> {
     /// # Examples
     ///
     /// ```
-    /// use prefix_tree::PrefixTreeMap;
+    /// use prefix_tree::PrefixMap;
     ///
-    /// let mut map: PrefixTreeMap<u8, i32> = PrefixTreeMap::new();
+    /// let mut map: PrefixMap<u8, i32> = PrefixMap::new();
     /// map.insert("foo", 1);
     /// if let Some(x) = map.get_mut("foo") {
     ///     *x = 2;
@@ -106,9 +106,9 @@ impl<K: Eq + Clone, V> PrefixTreeMap<K, V> {
     /// # Examples
     ///
     /// ```
-    /// use prefix_tree::PrefixTreeMap;
+    /// use prefix_tree::PrefixMap;
     ///
-    /// let mut map: PrefixTreeMap<u8, i32> = PrefixTreeMap::new();
+    /// let mut map: PrefixMap<u8, i32> = PrefixMap::new();
     /// assert_eq!(map.insert("a", 42), None);
     /// assert_eq!(map.is_empty(), false);
     /// assert_eq!(map.insert("a", 5), Some(42));
@@ -130,9 +130,9 @@ impl<K: Eq + Clone, V> PrefixTreeMap<K, V> {
     /// # Examples
     ///
     /// ```
-    /// use prefix_tree::PrefixTreeMap;
+    /// use prefix_tree::PrefixMap;
     ///
-    /// let mut map: PrefixTreeMap<u8, i32> = PrefixTreeMap::new();
+    /// let mut map: PrefixMap<u8, i32> = PrefixMap::new();
     /// assert_eq!(map.is_empty(), true);
     /// map.insert("foo", 1);
     /// assert_eq!(map.is_empty(), false);
@@ -146,9 +146,9 @@ impl<K: Eq + Clone, V> PrefixTreeMap<K, V> {
     /// # Examples
     ///
     /// ```
-    /// use prefix_tree::PrefixTreeMap;
+    /// use prefix_tree::PrefixMap;
     ///
-    /// let mut map: PrefixTreeMap<u8, i32> = PrefixTreeMap::new();
+    /// let mut map: PrefixMap<u8, i32> = PrefixMap::new();
     /// assert_eq!(map.len(), 0);
     /// map.insert("foo", 1);
     /// assert_eq!(map.len(), 1);
