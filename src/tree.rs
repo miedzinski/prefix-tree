@@ -7,7 +7,7 @@ fn common_prefix<T: Eq>(a: &[T], b: &[T]) -> usize {
 #[derive(Debug, Clone, Default)]
 pub struct Tree<K, V> {
     key: Vec<K>,
-    pub value: Option<V>,
+    value: Option<V>,
     children: Vec<Tree<K, V>>,
 }
 
@@ -26,6 +26,22 @@ impl<K: Eq + Clone, V> Tree<K, V> {
             value: None,
             children: vec![],
         }
+    }
+
+    pub fn key(&self) -> &[K] {
+        &self.key
+    }
+
+    pub fn value(&self) -> Option<&V> {
+        self.value.as_ref()
+    }
+
+    pub fn value_mut(&mut self) -> Option<&mut V> {
+        self.value.as_mut()
+    }
+
+    pub fn children(&self) -> &[Tree<K, V>] {
+        &self.children
     }
 
     pub fn find(&self, key: &[K]) -> Option<&Tree<K, V>> {

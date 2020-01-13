@@ -75,7 +75,7 @@ impl<K: Eq + Clone, V> PrefixMap<K, V> {
     where
         Q: AsRef<[K]>,
     {
-        self.root.find(key.as_ref()).and_then(|x| x.value.as_ref())
+        self.root.find(key.as_ref()).and_then(|x| x.value())
     }
 
     /// Returns a mutable reference to the value corresponding to the key.
@@ -96,9 +96,7 @@ impl<K: Eq + Clone, V> PrefixMap<K, V> {
     where
         Q: AsRef<[K]>,
     {
-        self.root
-            .find_mut(key.as_ref())
-            .and_then(|x| x.value.as_mut())
+        self.root.find_mut(key.as_ref()).and_then(|x| x.value_mut())
     }
 
     /// Inserts a key-value pair into the map.
