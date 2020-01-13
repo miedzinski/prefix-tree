@@ -1,4 +1,5 @@
 use crate::tree::Tree;
+use std::iter::FromIterator;
 
 /// A map implemented with prefix tree.
 #[derive(Debug, Clone, Default)]
@@ -153,5 +154,18 @@ impl<K: Eq + Clone, V> PrefixMap<K, V> {
     /// ```
     pub fn len(&self) -> usize {
         self.length
+    }
+}
+
+impl<'a, K: 'a + Eq + Clone, V: 'a + Clone> FromIterator<(&'a [K], V)> for PrefixMap<K, V> {
+    fn from_iter<I>(iter: I) -> PrefixMap<K, V>
+    where
+        I: IntoIterator<Item = (&'a [K], V)>,
+    {
+        let mut map = PrefixMap::new();
+        iter.into_iter().for_each(|(k, v)| {
+            map.insert(k, v);
+        });
+        map
     }
 }

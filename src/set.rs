@@ -1,4 +1,5 @@
 use map::PrefixMap;
+use std::iter::FromIterator;
 
 /// A set implemented as a `PrefixMap` where the value is `()`.
 #[derive(Debug, Default)]
@@ -106,5 +107,18 @@ impl<T: Eq + Clone> PrefixSet<T> {
     /// ```
     pub fn len(&self) -> usize {
         self.map.len()
+    }
+}
+
+impl<'a, T: 'a + Eq + Clone> FromIterator<&'a [T]> for PrefixSet<T> {
+    fn from_iter<I>(iter: I) -> PrefixSet<T>
+    where
+        I: IntoIterator<Item = &'a [T]>,
+    {
+        let mut set = PrefixSet::new();
+        iter.into_iter().for_each(|x| {
+            set.insert(x);
+        });
+        set
     }
 }
