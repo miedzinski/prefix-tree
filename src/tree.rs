@@ -138,7 +138,7 @@ mod tests {
         assert_eq!(t.find(&[1, 2]).and_then(|x| x.value), Some(0));
         assert_eq!(t.find(&[1, 2, 3]).and_then(|x| x.value), Some(1));
         assert_eq!(t.find(&[9, 8, 7]).and_then(|x| x.value), Some(3));
-        assert!(dbg!(t.find(&[])).is_none());
+        assert!(t.find(&[]).is_none());
         assert!(t.find(&[4, 5, 6]).is_none());
         assert!(t.find(&[0]).is_none());
         assert!(t.find(&[1, 2, 3, 3]).is_none());
