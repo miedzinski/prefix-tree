@@ -143,6 +143,16 @@ impl<'a, T: 'a + Eq + Clone> FromIterator<&'a [T]> for PrefixSet<T> {
     }
 }
 
+impl<'a, T: 'a + Eq + Clone> IntoIterator for &'a PrefixSet<T> {
+    type Item = Vec<T>;
+
+    type IntoIter = Iter<'a, T>;
+
+    fn into_iter(self) -> Self::IntoIter {
+        self.iter()
+    }
+}
+
 pub struct Iter<'a, T> {
     iter: MapIter<'a, T, ()>,
 }
