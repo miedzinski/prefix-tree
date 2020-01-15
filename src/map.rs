@@ -346,3 +346,11 @@ impl<K: Eq + Clone, V: Clone, Q: AsRef<[K]>> Index<Q> for PrefixMap<K, V> {
         self.get(index).expect("no entry found for key")
     }
 }
+
+impl<K: Eq + Clone, V: Clone + Eq> PartialEq<PrefixMap<K, V>> for PrefixMap<K, V> {
+    fn eq(&self, other: &PrefixMap<K, V>) -> bool {
+        self.len() == other.len() && self.iter().zip(other).all(|(a, b)| a == b)
+    }
+}
+
+impl<K: Eq + Clone, V: Eq + Clone> Eq for PrefixMap<K, V> {}

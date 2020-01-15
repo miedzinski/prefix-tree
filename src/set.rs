@@ -172,3 +172,11 @@ impl<'a, T: 'a + Eq + Clone> ExactSizeIterator for Iter<'a, T> {
 }
 
 impl<'a, T: 'a + Eq + Clone> FusedIterator for Iter<'a, T> {}
+
+impl<T: Eq + Clone> PartialEq<PrefixSet<T>> for PrefixSet<T> {
+    fn eq(&self, other: &PrefixSet<T>) -> bool {
+        self.len() == other.len() && self.iter().zip(other).all(|(a, b)| a == b)
+    }
+}
+
+impl<T: Eq + Clone> Eq for PrefixSet<T> {}
