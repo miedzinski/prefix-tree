@@ -78,6 +78,26 @@ impl<T: Eq + Clone> PrefixSet<T> {
         self.map.insert(key, ()).is_none()
     }
 
+    /// Removes a value from the set. Returns whether the value was present in the set.
+    ///
+    /// # Examples
+    ///
+    ///
+    /// ```
+    /// use prefix_tree::PrefixSet;
+    ///
+    /// let mut set: PrefixSet<u8> = PrefixSet::new();
+    /// set.insert("1");
+    /// assert_eq!(set.remove("1"), true);
+    /// assert_eq!(set.remove("1"), false);
+    /// ```
+    pub fn remove<Q>(&mut self, key: Q) -> bool
+    where
+        Q: AsRef<[T]>,
+    {
+        self.map.remove(key).is_some()
+    }
+
     /// Returns `true` if the set contains no elements.
     ///
     /// # Examples

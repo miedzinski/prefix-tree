@@ -126,6 +126,27 @@ impl<K: Eq + Clone, V> PrefixMap<K, V> {
         old
     }
 
+    /// Removes a key from the map, returning the value at the key
+    /// if the key was previously in the map.
+    ///
+    /// # Examples
+    ///
+    ///
+    /// ```
+    /// use prefix_tree::PrefixMap;
+    ///
+    /// let mut map: PrefixMap<u8, i32> = PrefixMap::new();
+    /// assert_eq!(map.insert("a", 42), None);
+    /// assert_eq!(map.remove("a"), Some(42));
+    /// assert_eq!(map.get("a"), None);
+    /// ```
+    pub fn remove<Q>(&mut self, key: Q) -> Option<V>
+    where
+        Q: AsRef<[K]>,
+    {
+        self.root.remove(key.as_ref())
+    }
+
     /// Returns `true` if the map contains no elements.
     ///
     /// # Examples

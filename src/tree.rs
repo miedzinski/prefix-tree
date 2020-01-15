@@ -105,6 +105,11 @@ impl<K: Eq + Clone, V> Tree<K, V> {
             }
         }
     }
+
+    pub fn remove(&mut self, key: &[K]) -> Option<V> {
+        // TODO: squash keys
+        self.find_mut(key).and_then(|x| x.value.take())
+    }
 }
 
 #[cfg(test)]
@@ -186,5 +191,17 @@ mod tests {
         );
         assert_eq!(root.find(&[3, 2, 1]).and_then(|x| x.value), Some(-1));
         assert_eq!(root.find(&[1, 2, 5, 6]).and_then(|x| x.value), Some(9));
+    }
+
+    #[test]
+    fn test_remove() {
+        let mut root = sample_tree();
+
+        assert_eq!(root.find(&[9, 8, 7]).is_some(), true);
+        root.remove(&[9, 8, 7]);
+        root.remove(&[1, 2]);
+        assert_eq!(root.find(&[9, 8, 7]).is_some(), false);
+        assert_eq!(root.find(&[1, 2]).is_some(), false);
+        assert_eq!(root.find(&[1, 2, 3]).and_then(|x| x.value), Some(1));
     }
 }
