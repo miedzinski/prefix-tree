@@ -1,4 +1,5 @@
 use map::{Iter as MapIter, PrefixMap};
+use std::hash::{Hash, Hasher};
 use std::iter::{FromIterator, FusedIterator};
 
 /// A set implemented as a `PrefixMap` where the value is `()`.
@@ -180,3 +181,9 @@ impl<T: Eq + Clone> PartialEq<PrefixSet<T>> for PrefixSet<T> {
 }
 
 impl<T: Eq + Clone> Eq for PrefixSet<T> {}
+
+impl<T: Eq + Clone + Hash> Hash for PrefixSet<T> {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.iter().for_each(|x| x.hash(state))
+    }
+}

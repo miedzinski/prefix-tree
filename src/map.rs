@@ -1,4 +1,5 @@
 use crate::tree::Tree;
+use std::hash::{Hash, Hasher};
 use std::iter::{FromIterator, FusedIterator};
 use std::ops::Index;
 
@@ -354,3 +355,9 @@ impl<K: Eq + Clone, V: Clone + Eq> PartialEq<PrefixMap<K, V>> for PrefixMap<K, V
 }
 
 impl<K: Eq + Clone, V: Eq + Clone> Eq for PrefixMap<K, V> {}
+
+impl<K: Eq + Clone + Hash, V: Clone + Hash> Hash for PrefixMap<K, V> {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        self.iter().for_each(|x| x.hash(state))
+    }
+}
