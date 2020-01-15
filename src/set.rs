@@ -1,5 +1,5 @@
-use map::PrefixMap;
-use std::iter::FromIterator;
+use map::{Iter as MapIter, PrefixMap};
+use std::iter::{FromIterator, Iterator};
 
 /// A set implemented as a `PrefixMap` where the value is `()`.
 #[derive(Debug, Default)]
@@ -108,6 +108,26 @@ impl<T: Eq + Clone> PrefixSet<T> {
     pub fn len(&self) -> usize {
         self.map.len()
     }
+
+    /// Gets an iterator that visits the values in `PrefixSet`.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// use prefix_tree::PrefixSet;
+    ///
+    /// let mut set: PrefixSet<u8> = PrefixSet::new();
+    /// set.insert("1");
+    /// set.insert("2");
+    /// let mut iter = set.iter();
+    /// assert_eq!(iter.next(), Some(vec![b'1']));
+    /// assert_eq!(iter.next(), Some(vec![b'2']));
+    /// ```
+    pub fn iter(&self) -> Iter<T> {
+        Iter {
+            iter: self.map.iter(),
+        }
+    }
 }
 
 impl<'a, T: 'a + Eq + Clone> FromIterator<&'a [T]> for PrefixSet<T> {
@@ -120,5 +140,17 @@ impl<'a, T: 'a + Eq + Clone> FromIterator<&'a [T]> for PrefixSet<T> {
             set.insert(x);
         });
         set
+    }
+}
+
+pub struct Iter<'a, T> {
+    iter: MapIter<'a, T, ()>,
+}
+
+impl<'a, T: 'a + Eq + Clone> Iterator for Iter<'a, T> {
+    type Item = Vec<T>;
+
+    fn next(&mut self) -> Option<Self::Item> {
+        self.iter.next().map(|(k, _)| k)
     }
 }
