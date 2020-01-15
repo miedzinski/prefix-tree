@@ -1,5 +1,6 @@
 use crate::tree::Tree;
 use std::iter::{FromIterator, FusedIterator};
+use std::ops::Index;
 
 /// A map implemented with prefix tree.
 #[derive(Debug, Clone, Default)]
@@ -337,3 +338,11 @@ impl<'a, K: 'a + Eq + Clone, V: 'a + Clone> ExactSizeIterator for Values<'a, K, 
 }
 
 impl<'a, K: 'a + Eq + Clone, V: 'a + Clone> FusedIterator for Values<'a, K, V> {}
+
+impl<K: Eq + Clone, V: Clone, Q: AsRef<[K]>> Index<Q> for PrefixMap<K, V> {
+    type Output = V;
+
+    fn index(&self, index: Q) -> &Self::Output {
+        self.get(index).expect("no entry found for key")
+    }
+}
