@@ -220,7 +220,7 @@ impl<K: Eq + Clone, V> PrefixMap<K, V> {
     }
 }
 
-impl<'a, K: 'a + Eq + Clone, V: 'a + Clone> FromIterator<(&'a [K], V)> for PrefixMap<K, V> {
+impl<'a, K: 'a + Eq + Clone, V: 'a> FromIterator<(&'a [K], V)> for PrefixMap<K, V> {
     fn from_iter<I>(iter: I) -> PrefixMap<K, V>
     where
         I: IntoIterator<Item = (&'a [K], V)>,
@@ -233,7 +233,7 @@ impl<'a, K: 'a + Eq + Clone, V: 'a + Clone> FromIterator<(&'a [K], V)> for Prefi
     }
 }
 
-impl<'a, K: 'a + Eq + Clone, V: 'a + Clone> IntoIterator for &'a PrefixMap<K, V> {
+impl<'a, K: 'a + Eq + Clone, V: 'a> IntoIterator for &'a PrefixMap<K, V> {
     type Item = (Vec<K>, &'a V);
 
     type IntoIter = Iter<'a, K, V>;
@@ -254,7 +254,7 @@ pub struct Iter<'a, K: 'a, V: 'a> {
     length: usize,
 }
 
-impl<'a, K: 'a + Eq + Clone, V: 'a + Clone> Iterator for Iter<'a, K, V> {
+impl<'a, K: 'a + Eq + Clone, V: 'a> Iterator for Iter<'a, K, V> {
     type Item = (Vec<K>, &'a V);
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -292,19 +292,19 @@ impl<'a, K: 'a + Eq + Clone, V: 'a + Clone> Iterator for Iter<'a, K, V> {
     }
 }
 
-impl<'a, K: 'a + Eq + Clone, V: 'a + Clone> ExactSizeIterator for Iter<'a, K, V> {
+impl<'a, K: 'a + Eq + Clone, V: 'a> ExactSizeIterator for Iter<'a, K, V> {
     fn len(&self) -> usize {
         self.length
     }
 }
 
-impl<'a, K: 'a + Eq + Clone, V: 'a + Clone> FusedIterator for Iter<'a, K, V> {}
+impl<'a, K: 'a + Eq + Clone, V: 'a> FusedIterator for Iter<'a, K, V> {}
 
 pub struct Keys<'a, K: 'a, V: 'a> {
     inner: Iter<'a, K, V>,
 }
 
-impl<'a, K: 'a + Eq + Clone, V: 'a + Clone> Iterator for Keys<'a, K, V> {
+impl<'a, K: 'a + Eq + Clone, V: 'a> Iterator for Keys<'a, K, V> {
     type Item = Vec<K>;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -312,19 +312,19 @@ impl<'a, K: 'a + Eq + Clone, V: 'a + Clone> Iterator for Keys<'a, K, V> {
     }
 }
 
-impl<'a, K: 'a + Eq + Clone, V: 'a + Clone> ExactSizeIterator for Keys<'a, K, V> {
+impl<'a, K: 'a + Eq + Clone, V: 'a> ExactSizeIterator for Keys<'a, K, V> {
     fn len(&self) -> usize {
         self.inner.length
     }
 }
 
-impl<'a, K: 'a + Eq + Clone, V: 'a + Clone> FusedIterator for Keys<'a, K, V> {}
+impl<'a, K: 'a + Eq + Clone, V: 'a> FusedIterator for Keys<'a, K, V> {}
 
 pub struct Values<'a, K: 'a, V: 'a> {
     inner: Iter<'a, K, V>,
 }
 
-impl<'a, K: 'a + Eq + Clone, V: 'a + Clone> Iterator for Values<'a, K, V> {
+impl<'a, K: 'a + Eq + Clone, V: 'a> Iterator for Values<'a, K, V> {
     type Item = &'a V;
 
     fn next(&mut self) -> Option<Self::Item> {
@@ -332,15 +332,15 @@ impl<'a, K: 'a + Eq + Clone, V: 'a + Clone> Iterator for Values<'a, K, V> {
     }
 }
 
-impl<'a, K: 'a + Eq + Clone, V: 'a + Clone> ExactSizeIterator for Values<'a, K, V> {
+impl<'a, K: 'a + Eq + Clone, V: 'a> ExactSizeIterator for Values<'a, K, V> {
     fn len(&self) -> usize {
         self.inner.length
     }
 }
 
-impl<'a, K: 'a + Eq + Clone, V: 'a + Clone> FusedIterator for Values<'a, K, V> {}
+impl<'a, K: 'a + Eq + Clone, V: 'a> FusedIterator for Values<'a, K, V> {}
 
-impl<K: Eq + Clone, V: Clone, Q: AsRef<[K]>> Index<Q> for PrefixMap<K, V> {
+impl<K: Eq + Clone, V, Q: AsRef<[K]>> Index<Q> for PrefixMap<K, V> {
     type Output = V;
 
     fn index(&self, index: Q) -> &Self::Output {
@@ -348,15 +348,15 @@ impl<K: Eq + Clone, V: Clone, Q: AsRef<[K]>> Index<Q> for PrefixMap<K, V> {
     }
 }
 
-impl<K: Eq + Clone, V: Clone + Eq> PartialEq<PrefixMap<K, V>> for PrefixMap<K, V> {
+impl<K: Eq + Clone, V: Eq> PartialEq<PrefixMap<K, V>> for PrefixMap<K, V> {
     fn eq(&self, other: &PrefixMap<K, V>) -> bool {
         self.len() == other.len() && self.iter().zip(other).all(|(a, b)| a == b)
     }
 }
 
-impl<K: Eq + Clone, V: Eq + Clone> Eq for PrefixMap<K, V> {}
+impl<K: Eq + Clone, V: Eq> Eq for PrefixMap<K, V> {}
 
-impl<K: Eq + Clone + Hash, V: Clone + Hash> Hash for PrefixMap<K, V> {
+impl<K: Eq + Clone + Hash, V: Hash> Hash for PrefixMap<K, V> {
     fn hash<H: Hasher>(&self, state: &mut H) {
         self.iter().for_each(|x| x.hash(state))
     }
