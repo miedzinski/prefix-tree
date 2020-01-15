@@ -1,5 +1,5 @@
 use map::{Iter as MapIter, PrefixMap};
-use std::iter::{FromIterator, Iterator};
+use std::iter::{FromIterator, FusedIterator};
 
 /// A set implemented as a `PrefixMap` where the value is `()`.
 #[derive(Debug, Default)]
@@ -154,3 +154,11 @@ impl<'a, T: 'a + Eq + Clone> Iterator for Iter<'a, T> {
         self.iter.next().map(|(k, _)| k)
     }
 }
+
+impl<'a, T: 'a + Eq + Clone> ExactSizeIterator for Iter<'a, T> {
+    fn len(&self) -> usize {
+        self.iter.len()
+    }
+}
+
+impl<'a, T: 'a + Eq + Clone> FusedIterator for Iter<'a, T> {}

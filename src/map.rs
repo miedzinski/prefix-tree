@@ -290,13 +290,13 @@ impl<'a, K: 'a + Eq + Clone, V: 'a + Clone> Iterator for Iter<'a, K, V> {
     }
 }
 
-impl<K: Eq + Clone, V: Clone> ExactSizeIterator for Iter<'_, K, V> {
+impl<'a, K: 'a + Eq + Clone, V: 'a + Clone> ExactSizeIterator for Iter<'a, K, V> {
     fn len(&self) -> usize {
         self.length
     }
 }
 
-impl<K: Eq + Clone, V: Clone> FusedIterator for Iter<'_, K, V> {}
+impl<'a, K: 'a + Eq + Clone, V: 'a + Clone> FusedIterator for Iter<'a, K, V> {}
 
 pub struct Keys<'a, K: 'a, V: 'a> {
     inner: Iter<'a, K, V>,
@@ -310,6 +310,14 @@ impl<'a, K: 'a + Eq + Clone, V: 'a + Clone> Iterator for Keys<'a, K, V> {
     }
 }
 
+impl<'a, K: 'a + Eq + Clone, V: 'a + Clone> ExactSizeIterator for Keys<'a, K, V> {
+    fn len(&self) -> usize {
+        self.inner.length
+    }
+}
+
+impl<'a, K: 'a + Eq + Clone, V: 'a + Clone> FusedIterator for Keys<'a, K, V> {}
+
 pub struct Values<'a, K: 'a, V: 'a> {
     inner: Iter<'a, K, V>,
 }
@@ -321,3 +329,11 @@ impl<'a, K: 'a + Eq + Clone, V: 'a + Clone> Iterator for Values<'a, K, V> {
         self.inner.next().map(|(_, v)| v)
     }
 }
+
+impl<'a, K: 'a + Eq + Clone, V: 'a + Clone> ExactSizeIterator for Values<'a, K, V> {
+    fn len(&self) -> usize {
+        self.inner.length
+    }
+}
+
+impl<'a, K: 'a + Eq + Clone, V: 'a + Clone> FusedIterator for Values<'a, K, V> {}
