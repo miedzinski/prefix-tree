@@ -3,7 +3,7 @@ use std::hash::{Hash, Hasher};
 use std::iter::{FromIterator, FusedIterator};
 
 /// A set implemented as a `PrefixMap` where the value is `()`.
-#[derive(Debug, Default)]
+#[derive(Clone, Debug, Default)]
 pub struct PrefixSet<T> {
     map: PrefixMap<T, ()>,
 }
